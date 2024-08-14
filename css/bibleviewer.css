@@ -1,0 +1,192 @@
+.fixed {
+  position: fixed
+}
+
+.absolute {
+  position: absolute
+}
+
+.sticky {
+  position: sticky
+}
+
+.inset-0 {
+  inset: 0px
+}
+
+.top-0 {
+  top: 0px
+}
+
+.z-\[900\] {
+  z-index: 900
+}
+
+.z-\[98\] {
+  z-index: 98
+}
+
+.mt-10 {
+  margin-top: 2.5rem
+}
+
+.\!flex {
+  display: flex !important
+}
+
+.flex {
+  display: flex
+}
+
+.grid {
+  display: grid
+}
+
+.h-8 {
+  height: 2rem
+}
+
+.h-full {
+  height: 100%
+}
+
+.max-h-96 {
+  max-height: 24rem
+}
+
+.max-h-\[40rem\] {
+  max-height: 40rem
+}
+
+.w-full {
+  width: 100%
+}
+
+.max-w-96 {
+  max-width: 24rem
+}
+
+.max-w-\[40rem\] {
+  max-width: 40rem
+}
+
+.grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr))
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr))
+}
+
+.grid-cols-6 {
+  grid-template-columns: repeat(6, minmax(0, 1fr))
+}
+
+.flex-wrap {
+  flex-wrap: wrap
+}
+
+.items-center {
+  align-items: center
+}
+
+.justify-center {
+  justify-content: center
+}
+
+.\!justify-between {
+  justify-content: space-between !important
+}
+
+.justify-stretch {
+  justify-content: stretch
+}
+
+.gap-2 {
+  gap: 0.5rem
+}
+
+.gap-px {
+  gap: 1px
+}
+
+.text-nowrap {
+  text-wrap: nowrap
+}
+
+.border {
+  border-width: 1px
+}
+
+.bg-black {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity))
+}
+
+.bg-black\/20 {
+  background-color: rgb(0 0 0 / 0.2)
+}
+
+.bg-gray-600 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(75 85 99 / var(--tw-bg-opacity))
+}
+
+.bg-gray-800 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(31 41 55 / var(--tw-bg-opacity))
+}
+
+.\!p-\[unset\] {
+  padding: unset !important
+}
+
+.\!py-\[unset\] {
+  padding-top: unset !important;
+  padding-bottom: unset !important
+}
+
+.px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem
+}
+
+.py-1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem
+}
+
+.text-left {
+  text-align: left
+}
+
+.font-sans {
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"
+}
+
+.text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem
+}
+
+.font-bold {
+  font-weight: 700
+}
+
+.text-white {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity))
+}
+
+.\[\&_button\]\:border-none button {
+  border-style: none
+}
+
+.\[\&_button\]\:font-sans button {
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"
+}
+
+.\[\&_button\]\:text-white button {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity))
+}

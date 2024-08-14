@@ -1,0 +1,343 @@
+<main
+  class="[&_button]:font-sans [&_button]:text-white [&_button]:border-none font-sans"
+  x-data="myData"
+>
+  <div
+    class="!flex gap-px !justify-between flex-wrap sticky z-[98] top-0 bg-black"
+  >
+    <div class="!flex gap-px h-8">
+      <button
+        class="bg-gray-800 px-3 !py-[unset] font-bold"
+        x-on:click="$dispatch('toggle-modules')"
+        x-text="module"
+      ></button>
+      <button
+        class="bg-gray-800 px-3 !py-[unset] font-bold"
+        x-on:click="$dispatch('toggle-books')"
+        x-text="`${bookstable?.find(book =>book.book_number == book_number)?.short_name||book_number} ${chapter}`"
+      ></button>
+
+      <button
+        class="bg-gray-800 px-3 !py-[unset]"
+        x-on:click="chapter--"
+        x-on:keyup.left.window="chapter--"
+      >
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <button
+        class="bg-gray-800 px-3 !py-[unset]"
+        x-on:click="chapter++; "
+        x-on:keyup.right.window="chapter++"
+      >
+        <i class="fas fa-arrow-right"></i>
+      </button>
+      <button
+        x-show="!module2"
+        class="bg-gray-800 px-3 !py-[unset]"
+        x-on:click="module2 = modules.find(mod => mod != module)"
+      >
+        <i class="far fa-plus-square"></i>
+      </button>
+    </div>
+
+    <template x-if="module2">
+      <div class="!flex gap-px h-8">
+        <button
+          class="bg-gray-800 px-3 !py-[unset] font-bold"
+          x-on:click="$dispatch('toggle-modules2')"
+          x-text="module2"
+        ></button>
+        <button
+          class="bg-gray-800 !py-[unset] px-3 font-bold"
+          x-on:click="$dispatch('toggle-books2')"
+          x-text="`${bookstable2?.find(book =>book.book_number == book_number)?.short_name||book_number} ${chapter}`"
+        ></button>
+
+        <button class="bg-gray-800 px-3 !py-[unset]" x-on:click="module2 = ''">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </template>
+  </div>
+  <div
+    x-data="{booksopened: false}"
+    x-on:toggle-books.window="booksopened = !booksopened"
+    x-on:module-changed.window="bookstable =await (await fetch(`/wp-json/wp-bibleviewer/v1/books?m=${module}`)).json()"
+    x-init="bookstable =await (await fetch(`/wp-json/wp-bibleviewer/v1/books?m=${module}`)).json() "
+    class="flex justify-center items-center z-[900] fixed bg-black/20 inset-0"
+    x-show="booksopened"
+    x-cloak
+  >
+    <div
+      x-on:click.outside="booksopened = false"
+      x-on:click="$dispatch('book-changed')"
+      class="grid w-full h-full gap-px bg-black max-w-96 max-h-96 grid-cols-6"
+    >
+      <template x-for="book in bookstable" x-key="book.book_number">
+        <button
+          class="border font-bold text-nowrap !p-[unset] bg-gray-800"
+          x-bind:style="`color: ${book.book_color}`"
+          x-text="book.short_name"
+          x-on:click="book_number = book.book_number; booksopened = false"
+        ></button>
+      </template>
+    </div>
+  </div>
+
+  <div
+    x-data="{books2opened: false}"
+    x-on:toggle-books2.window="books2opened = !books2opened"
+    x-on:module2-changed.window="bookstable2 = module2 ? await (await fetch(`/wp-json/wp-bibleviewer/v1/books?m=${module2}`)).json() : [] "
+    x-init="bookstable2 = module2 ? await (await fetch(`/wp-json/wp-bibleviewer/v1/books?m=${module2}`)).json() : []"
+    class="flex fixed z-[900] inset-0 justify-center items-center bg-black/20"
+    x-show="books2opened"
+    x-cloak
+  >
+    <div
+      x-on:click.outside="books2opened = false"
+      x-on:click="$dispatch('book-changed')"
+      class="bg-black grid grid-cols-6 h-full w-full max-w-96 max-h-96 gap-px"
+    >
+      <template x-for="book in bookstable2" x-key="book.book_number">
+        <button
+          class="border text-nowrap !p-[unset] bg-gray-800"
+          x-bind:style="`color: ${book.book_color}`"
+          x-text="book.short_name"
+          x-on:click="book_number = book.book_number; book2opened = false"
+        ></button>
+      </template>
+    </div>
+  </div>
+  <div
+    x-data="{chaptersopened: false}"
+    x-on:book-changed.window="chaptersopened = true"
+    class="flex justify-center items-center z-[900] fixed bg-black/20 inset-0"
+    x-show="chaptersopened"
+    x-cloak
+  >
+    <div
+      x-on:click.outside="chaptersopened = false"
+      class="grid justify-stretch w-full h-full gap-px bg-black max-w-[40rem] max-h-[40rem] grid-cols-6"
+      x-bind:style="`grid-template-columns: repeat(${chaptercolumns}, minmax(0, 1fr))`"
+    >
+      <template x-for="chap in maxchapter" x-key="chap">
+        <button
+          class="font-bold text-nowrap !p-[unset] text-white bg-gray-600"
+          x-bind:class="chap == chapter ? 'bg-gray-600': 'bg-gray-800'"
+          x-text="chap"
+          x-on:click="chapter = chap; chaptersopened = false"
+        ></button>
+      </template>
+    </div>
+  </div>
+
+  <div
+    x-data="{modulesmenuopened: false,}"
+    x-on:toggle-modules.window="modulesmenuopened = !modulesmenuopened"
+    x-on:htmx:after-swap.window="modules = await (await fetch('/wp-json/wp-bibleviewer/v1/module-script')).json()"
+    class="flex bg-black/20 z-[900] justify-center items-center fixed flex-wrap inset-0"
+    x-show="modulesmenuopened"
+    x-cloak
+  >
+    <div
+      x-on:click.outside="modulesmenuopened = false"
+      class="max-h-96 max-w-96 grid grid-cols-1 bg-black gap-px"
+    >
+      <template x-for="singlemodule in modules" x-key="singlemodule">
+        <button
+          class="text-nowrap py-1 px-3 text-left bg-gray-800"
+          x-text="singlemodule"
+          x-show="singlemodule != module && singlemodule != module2"
+          x-on:click="module = singlemodule ; modulesmenuopened = false"
+        ></button>
+      </template>
+    </div>
+  </div>
+
+  <div
+    x-data="{modules2menuopened: false}"
+    x-on:toggle-modules2.window="modules2menuopened = !modules2menuopened"
+    class="flex fixed justify-center z-[900] items-center inset-0 bg-black/20"
+    id="modules2"
+    x-show="modules2menuopened"
+    x-cloak
+  >
+    <div
+      x-on:click.outside="modules2menuopened = false"
+      class="grid grid-cols-1 gap-px bg-black max-w-96 max-h-96 h-full"
+    >
+      <template x-for="singlemodule in modules" x-key="singlemodule + '-2'">
+        <button
+          class="text-left text-nowrap !py-[unset] px-3 bg-gray-800"
+          x-text="singlemodule"
+          x-show="singlemodule != module2 && singlemodule != module"
+          x-on:click="module2 = singlemodule; modules2menuopened = false"
+        ></button>
+      </template>
+    </div>
+  </div>
+
+  <div
+    hx-get="/wp-json/wp-bibleviewer/v1/html"
+    x-bind:hx-vals="JSON.stringify({
+        m: module,
+        m2: module2,
+        b: book_number,
+        c: chapter
+        })"
+    hx-target="#bible"
+    hx-trigger="load, changed from:document"
+  ></div>
+
+  <section id="bible" class="mt-10 text-xl">
+    <div class="grid grid-cols-3 w-full"></div>
+  </section>
+</main>
+
+<script>
+  document.addEventListener("alpine:init", () => {
+    Alpine.data("myData", () => ({
+      module: Alpine.$persist("OGB"),
+      module2: Alpine.$persist(""),
+      book_number: Alpine.$persist(470),
+      chapter: Alpine.$persist(1).as("_x_other-chapter"),
+      bookstable: [],
+      bookstable2: [],
+      modules: [],
+      chapter_string: "თავი",
+      chapter_string_ps: "ფსალმუნი",
+      maxchapter: 1,
+      chaptercolumns: 6,
+      books: Alpine.$persist([
+        { book_number: 10, max: 50, chapter: 1 },
+        { book_number: 20, max: 40, chapter: 1 },
+        { book_number: 30, max: 27, chapter: 1 },
+        { book_number: 40, max: 36, chapter: 1 },
+        { book_number: 50, max: 34, chapter: 1 },
+        { book_number: 60, max: 24, chapter: 1 },
+        { book_number: 70, max: 21, chapter: 1 },
+        { book_number: 80, max: 4, chapter: 1 },
+        { book_number: 90, max: 31, chapter: 1 },
+        { book_number: 100, max: 24, chapter: 1 },
+        { book_number: 110, max: 22, chapter: 1 },
+        { book_number: 120, max: 25, chapter: 1 },
+        { book_number: 130, max: 29, chapter: 1 },
+        { book_number: 140, max: 36, chapter: 1 },
+        { book_number: 150, max: 10, chapter: 1 },
+        { book_number: 160, max: 5, chapter: 1 },
+        { book_number: 190, max: 5, chapter: 1 },
+        { book_number: 220, max: 43, chapter: 1 },
+        { book_number: 230, max: 150, chapter: 1 },
+        { book_number: 240, max: 31, chapter: 1 },
+        { book_number: 250, max: 5, chapter: 1 },
+        { book_number: 260, max: 8, chapter: 1 },
+        { book_number: 290, max: 66, chapter: 1 },
+        { book_number: 300, max: 52, chapter: 1 },
+        { book_number: 310, max: 5, chapter: 1 },
+        { book_number: 330, max: 48, chapter: 1 },
+        { book_number: 340, max: 14, chapter: 1 },
+        { book_number: 350, max: 14, chapter: 1 },
+        { book_number: 360, max: 4, chapter: 1 },
+        { book_number: 370, max: 9, chapter: 1 },
+        { book_number: 380, max: 1, chapter: 1 },
+        { book_number: 390, max: 4, chapter: 1 },
+        { book_number: 400, max: 7, chapter: 1 },
+        { book_number: 410, max: 3, chapter: 1 },
+        { book_number: 420, max: 3, chapter: 1 },
+        { book_number: 430, max: 3, chapter: 1 },
+        { book_number: 440, max: 2, chapter: 1 },
+        { book_number: 450, max: 14, chapter: 1 },
+        { book_number: 460, max: 4, chapter: 1 },
+        { book_number: 470, max: 28, chapter: 1 },
+        { book_number: 480, max: 16, chapter: 1 },
+        { book_number: 490, max: 24, chapter: 1 },
+        { book_number: 500, max: 21, chapter: 1 },
+        { book_number: 510, max: 28, chapter: 1 },
+        { book_number: 520, max: 16, chapter: 1 },
+        { book_number: 530, max: 16, chapter: 1 },
+        { book_number: 540, max: 13, chapter: 1 },
+        { book_number: 550, max: 6, chapter: 1 },
+        { book_number: 560, max: 6, chapter: 1 },
+        { book_number: 570, max: 4, chapter: 1 },
+        { book_number: 580, max: 4, chapter: 1 },
+        { book_number: 590, max: 5, chapter: 1 },
+        { book_number: 600, max: 3, chapter: 1 },
+        { book_number: 610, max: 6, chapter: 1 },
+        { book_number: 620, max: 4, chapter: 1 },
+        { book_number: 630, max: 3, chapter: 1 },
+        { book_number: 640, max: 1, chapter: 1 },
+        { book_number: 650, max: 13, chapter: 1 },
+        { book_number: 660, max: 5, chapter: 1 },
+        { book_number: 670, max: 5, chapter: 1 },
+        { book_number: 680, max: 3, chapter: 1 },
+        { book_number: 690, max: 5, chapter: 1 },
+        { book_number: 700, max: 1, chapter: 1 },
+        { book_number: 710, max: 1, chapter: 1 },
+        { book_number: 720, max: 1, chapter: 1 },
+        { book_number: 730, max: 22, chapter: 1 },
+      ]),
+      getSquareColumns(maxItems) {
+        // Calculate the square root of the maximum number of items
+        const squareRoot = Math.sqrt(maxItems);
+
+        // Round down the square root to the nearest integer
+        const columns = Math.floor(squareRoot);
+
+        // If the number of items is a perfect square, return the square root
+        if (columns * columns === maxItems) {
+          return columns;
+        }
+
+        // If the number of items is not a perfect square, return the next higher integer
+        return columns + 1;
+      },
+      init() {
+        if (!this.module) this.module = "OGB";
+        this.$dispatch("getbooks");
+        this.$dispatch("getbooks2");
+
+        this.$watch("chapter", (value, oldValue) => {
+          window.scrollTo(0, 0);
+          if (
+            this.books.find((book) => book.book_number == this.book_number)
+              .max < value ||
+            value < 1
+          ) {
+            this.chapter = oldValue;
+          } else {
+            this.books.find(
+              (book) => book.book_number == this.book_number,
+            ).chapter = value;
+            this.books = this.books;
+            this.$dispatch("changed");
+          }
+        });
+        this.$watch("module", () => {
+          this.$dispatch("module-changed");
+          this.$dispatch("changed");
+        });
+        this.$watch("module2", () => {
+          this.$dispatch("module2-changed");
+          this.$dispatch("changed");
+        });
+        this.$watch("book_number", (value, oldValue) => {
+          window.scrollTo(0, 0);
+          this.chapter = this.books.find(
+            (book) => book.book_number == value,
+          ).chapter;
+          this.maxchapter = this.books.find(
+            (book) => book.book_number == value,
+          ).max;
+          this.chaptercolumns = this.getSquareColumns(this.maxchapter);
+          this.$dispatch("changed");
+          this.$dispatch("book-changed");
+        });
+
+        this.maxchapter = this.books.find(
+          (book) => book.book_number == this.book_number,
+        ).max;
+        this.chaptercolumns = this.getSquareColumns(this.maxchapter);
+      },
+    }));
+  });
+</script>
